@@ -1,0 +1,27 @@
+{
+  "version": "1.0.1",
+  "releaseDate": "2025-11-25",
+  "releaseType": "patch",
+  "semanticVersioning": {
+    "major": 1,
+    "minor": 0,
+    "patch": 1
+  },
+  "changes": {
+    "new": [
+      "Chatbot is updated allowing mode switching and math symbols"
+    ],
+    "improved": [
+      "Made browser allow new shortcuts and loading bar"
+    ],
+    "fixed": [
+      "Movies tab works along with search"
+    ],
+    "deprecated": []
+  },
+  "breakingChanges": [
+  ],
+  "links": {
+    "github": "https://github.com/unblockee-testing/"
+  }
+}

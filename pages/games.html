@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - Unblockee</title>
+
+    <!-- Icons & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../all.css">
+
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="../components/topbar.css">
+    <link rel="stylesheet" href="../components/settings.css">
+    <link rel="stylesheet" href="../components/changelog.css">
+    <link rel="stylesheet" href="../components/chatbot.css">
+
+    <style>
+        /* --- LAYOUT & HERO --- */
+        .hero-section {
+            padding: var(--padding-xl) var(--padding-xl);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-md);
+        }
+
+        #header h1 {
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
+            margin-bottom: 0.5rem;
+        }
+
+        #header p {
+            font-size: var(--font-size-md);
+            color: var(--text-secondary);
+            min-height: clamp(20px, 3vh, 24px);
+            animation: fadeIn 1s ease-in-out 0.2s backwards;
+        }
+
+        /* --- LIBRARY BUTTONS --- */
+        .library-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 5px;
+            animation: popIn 0.5s ease;
+        }
+
+        .lib-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 18px;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .lib-btn:hover {
+            background: var(--card-color);
+            color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        .lib-btn.active {
+            background: var(--text-primary);
+            color: var(--bg-color);
+            border-color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* --- CONTROLS --- */
+        .controls-container {
+            display: flex;
+            align-items: center;
+            background: var(--search-bar-color);
+            padding: var(--padding-sm) var(--padding-md);
+            border-radius: clamp(1rem, 4vw, 2rem);
+            box-shadow: 0 clamp(3px, 1vh, 6px) clamp(15px, 5vh, 30px) rgba(0, 0, 0, 0.7);
+            animation: popIn 0.6s ease;
+            width: 100%;
+            max-width: clamp(300px, 80vw, 550px);
+            border: 1px solid var(--border-color);
+        }
+
+        #searchBar {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            padding: var(--padding-xs);
+        }
+
+        #sortOptions {
+            background: var(--card-color);
+            border: none;
+            color: var(--text-primary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--padding-xs) var(--padding-sm);
+            margin-left: var(--margin-sm);
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        #sortOptions:hover { background: #2a2a2a; }
+
+        /* --- GRID --- */
+        .container {
+            max-width: clamp(800px, 95vw, 1600px);
+            margin: 0 auto;
+            padding: var(--padding-xl);
+        }
+
+        #container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 15vw, 200px), 1fr));
+            gap: var(--gap-lg);
+        }
+
+        /* --- GAME CARD --- */
+        .game-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 var(--padding-xs) clamp(5px, 1vw, 10px) rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+            aspect-ratio: 1 / 1;
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px) scale(1.05);
+            background: #2a2a2a;
+            z-index: 10;
+        }
+
+        .game-cover {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .lib2-fallback { background-image: var(--bg-image), url('../../assets/img/default_game.png'); }
+
+        .game-title {
+            position: absolute;
+            bottom: var(--padding-sm);
+            left: 0;
+            right: 0;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 0 var(--padding-xs);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        }
+
+        .star-icon {
+            position: absolute;
+            top: var(--padding-sm);
+            right: var(--padding-sm);
+            z-index: 2;
+            color: white;
+            font-size: var(--icon-size-md);
+            opacity: 0.8;
+            transition: all 0.2s;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .star-icon:hover { transform: scale(1.15); opacity: 1; color: gold; }
+        .favorited { color: gold !important; opacity: 1 !important; }
+
+        /* --- SKELETON LOADING --- */
+        .skeleton-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius-lg);
+            aspect-ratio: 1 / 1;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .skeleton-cover {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #2a2a2a 0%, #333 50%, #2a2a2a 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        .skeleton-title {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            right: 12px;
+            height: 14px;
+            background: linear-gradient(90deg, #2a2a2a 0%, #333 50%, #2a2a2a 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            opacity: 0.8;
+        }
+
+        /* --- ANIMATIONS --- */
+        .fade-in { animation: fadeInCard 0.5s ease forwards; opacity: 0; }
+        @keyframes fadeInCard { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        /* --- UTILS --- */
+        iframe { width: 100%; height: 100%; border: none; }
+        .hidden { display: none !important; }
+        .error-message { grid-column: 1 / -1; text-align: center; color: #ff5555; font-size: 1.2rem; margin-top: 50px; }
+    </style>
+
+    <!-- Dependencies -->
+    <script src="../utils/storage.js" defer></script>
+    <script src="../utils/about-blank.js" defer></script>
+    <script src="../utils/notifications.js" defer></script>
+    <script src="../staticsj/quotes.js" defer></script>
+    <!-- Main Modal Controller -->
+    <script src="../utils/popup.js" defer></script>
+
+    <!-- Data for Library 2 -->
+    <script src="../components/zones2.js" defer></script>
+
+    <!-- Components -->
+    <script src="../components/topbar.js" defer></script>
+    <script src="../components/settings.js" defer></script>
+    <script src="../components/changelog.js" defer></script>
+    <script src="../components/chatbot.js" defer></script>
+</head>
+
+<body class="with-topbar">
+    <div id="app-background"></div>
+    <div id="topbar-container"></div>
+
+    <div class="hero-section">
+        <div id="header">
+            <h1>Games</h1>
+            <p id="subtitle">Loading quotes...</p>
+        </div>
+
+        <!-- Library Toggle Buttons -->
+        <div class="library-buttons">
+            <button class="lib-btn" id="btn-lib1" onclick="toggleLibrary(false)">Library 1 (GN-Math)</button>
+            <button class="lib-btn" id="btn-lib2" onclick="toggleLibrary(true)">Library 2 (UGS)</button>
+        </div>
+
+        <div class="controls-container">
+            <input type="text" id="searchBar" placeholder="Search games..." oninput="filterZones()">
+            <select id="sortOptions" onchange="sortZones()">
+                <option value="popular">Popular</option>
+                <option value="name">Name</option>
+                <option value="id">Newest</option>
+            </select>
+        </div>
+    </div>
+
+    <main class="container">
+        <div id="container"></div>
+    </main>
+
+    <script>
+        // --- CONFIGURATION ---
+        const ZONES_1_URL = "https://cdn.jsdelivr.net/gh/gn-math/assets@latest/zones.json";
+        const HTML_PREFIX_1 = "https://cdn.jsdelivr.net/gh/gn-math/html@main";
+        const COVER_PREFIX_1 = "https://cdn.jsdelivr.net/gh/gn-math/covers@main";
+        const COVER_PREFIX_2 = "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/";
+        const HTML_PREFIX_2 = "https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/";
+
+        // Define Manual Overrides here (ID -> specific URL)
+        const GAME_OVERRIDES = {
+            266: "https://cdn.jsdelivr.net/gh/gn-math/html@main/266.html" // Speedstars Override
+        };
+
+        let allZones = [];
+        let popularityData = {};
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            setTimeout(setSubtitle, 50);
+            const useLib2 = StorageUtils.getBoolean('alternateGameLibraryEnabled', false);
+            updateButtonState(useLib2);
+            showSkeleton();
+            await loadGames(useLib2);
+        });
+
+        function setSubtitle() {
+            const subtitle = document.getElementById('subtitle');
+            if (window.QUOTES && Array.isArray(window.QUOTES) && window.QUOTES.length > 0) {
+                subtitle.innerHTML = window.QUOTES[Math.floor(Math.random() * window.QUOTES.length)];
+            } else {
+                subtitle.textContent = "ur not sigma";
+            }
+        }
+
+        function updateButtonState(isLib2) {
+            document.getElementById('btn-lib1').classList.toggle('active', !isLib2);
+            document.getElementById('btn-lib2').classList.toggle('active', isLib2);
+        }
+
+        async function toggleLibrary(enableLib2) {
+            StorageUtils.setBoolean('alternateGameLibraryEnabled', enableLib2);
+            updateButtonState(enableLib2);
+            allZones = [];
+            showSkeleton();
+            await loadGames(enableLib2);
+        }
+
+        function showSkeleton() {
+            const container = document.getElementById('container');
+            container.innerHTML = Array(20).fill(`
+                <div class="skeleton-card">
+                    <div class="skeleton-cover"></div>
+                    <div class="skeleton-title"></div>
+                </div>
+            `).join('');
+        }
+
+        async function loadGames(useLib2) {
+            try {
+                // Fetch Stats for Popularity
+                fetch("https://data.jsdelivr.com/v1/stats/packages/gh/gn-math/html@main/files?period=year")
+                    .then(r => r.json()).then(d => {
+                        d.forEach(f => {
+                            const match = f.name.match(/\/(\d+)\.html$/);
+                            if (match) popularityData[parseInt(match[1])] = f.hits.total;
+                        });
+                    }).catch(e => console.warn("Stats failed", e));
+
+                let zones = [];
+
+                if (useLib2) {
+                    if (typeof files === 'undefined') throw new Error("Library 2 data (zones2.js) failed to load.");
+                    zones = files.map((f, i) => ({
+                        id: 9000 + i,
+                        name: formatName(f),
+                        url: `${HTML_PREFIX_2}${f}.html`,
+                        cover: `${COVER_PREFIX_2}${f}.png`,
+                        isLib2: true
+                    }));
+                } else {
+                    const response = await fetch(ZONES_1_URL);
+                    if (!response.ok) throw new Error("Failed to fetch Library 1");
+                    zones = await response.json();
+                    
+                    zones.forEach(z => {
+                        // 1. Check for Manual Overrides
+                        if (GAME_OVERRIDES[z.id]) {
+                            z.url = GAME_OVERRIDES[z.id];
+                        } else {
+                            // 2. Standard Logic
+                            z.url = z.url.replace("{HTML_URL}", HTML_PREFIX_1);
+
+                            // 3. FIX: Remove "-a" suffix from URLs if present
+                            // This fixes games that point to 266-a.html instead of 266.html
+                            z.url = z.url.replace("-a.html", ".html");
+                        }
+
+                        z.cover = z.cover.replace("{COVER_URL}", COVER_PREFIX_1);
+                    });
+                }
+
+                allZones = zones;
+                sortZones();
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('container').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i><br>
+                        ${err.message || "Error loading games."}<br>
+                        <button class="btn" onclick="location.reload()" style="margin-top:15px">Reload Page</button>
+                    </div>`;
+            }
+        }
+
+        function displayZones(zones) {
+            const container = document.getElementById('container');
+            const favorites = JSON.parse(localStorage.getItem('favoriteGames') || '[]');
+
+            container.innerHTML = zones.map((game, index) => {
+                const isFav = favorites.includes(game.id.toString());
+                const bgStyle = game.isLib2
+                    ? `style="--bg-image: url('${game.cover}');"`
+                    : `style="background-image: url('${game.cover}');"`;
+                const coverClass = game.isLib2 ? "game-cover lib2-fallback" : "game-cover lazy-cover";
+
+                return `
+                <div class="game-card fade-in" style="animation-delay: ${Math.min(index * 0.03, 1)}s" onclick="handleCardClick(${game.id})">
+                    <i class="star-icon fa-${isFav ? 'solid favorited' : 'regular'} fa-star" 
+                       onclick="toggleFavorite(event, '${game.id}')"></i>
+                    <div class="${coverClass}" ${bgStyle} data-src="${game.cover}"></div>
+                    <div class="game-title">${game.name}</div>
+                </div>
+                `;
+            }).join('');
+
+            if (!zones[0]?.isLib2) lazyLoadImages();
+        }
+
+        function handleCardClick(id) {
+            const game = allZones.find(z => z.id == id);
+            // Calls the aliased function in popup.js
+            if (game && window.openGameModal) window.openGameModal(game);
+        }
+
+        function sortZones() {
+            const sortBy = document.getElementById('sortOptions').value;
+            const favorites = JSON.parse(localStorage.getItem('favoriteGames') || '[]');
+            const sorted = [...allZones].sort((a, b) => {
+                const aFav = favorites.includes(a.id.toString());
+                const bFav = favorites.includes(b.id.toString());
+                if (aFav && !bFav) return -1;
+                if (!aFav && bFav) return 1;
+
+                if (sortBy === 'name') return a.name.localeCompare(b.name);
+                if (sortBy === 'id') return b.id - a.id;
+                return (popularityData[b.id] || 0) - (popularityData[a.id] || 0);
+            });
+            displayZones(sorted);
+        }
+
+        function filterZones() {
+            const q = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = allZones.filter(z => z.name.toLowerCase().includes(q));
+            displayZones(filtered);
+        }
+
+        function toggleFavorite(e, id) {
+            e.stopPropagation();
+            let favs = JSON.parse(localStorage.getItem('favoriteGames') || '[]');
+            if (favs.includes(id)) {
+                favs = favs.filter(f => f !== id);
+                if (window.NotificationManager) window.NotificationManager.notify("Removed from favorites", "info");
+            } else {
+                favs.push(id);
+                if (window.NotificationManager) window.NotificationManager.notify("Added to favorites", "success");
+            }
+            localStorage.setItem('favoriteGames', JSON.stringify(favs));
+            sortZones();
+        }
+
+        function lazyLoadImages() {
+            const obs = new IntersectionObserver((entries, observer) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        e.target.style.backgroundImage = `url('${e.target.dataset.src}')`;
+                        observer.unobserve(e.target);
+                    }
+                });
+            });
+            document.querySelectorAll('.lazy-cover').forEach(i => obs.observe(i));
+        }
+
+        function formatName(str) {
+            return str.replace(/^cl/, '').replace(/([A-Z])/g, ' $1')
+                .replace(/(\d+)/g, ' $1').replace(/\s+/g, ' ').trim()
+                .replace(/^./, s => s.toUpperCase());
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+<!--
+  Shared SVG sprite for built-in shortcut icons.
+  - Coderunner: <use href="components/icons.svg#icon-coderunner" />
+  - Chatbot: <use href="components/icons.svg#icon-chatbot" />
+  - box.rhw.one: <use href="components/icons.svg#icon-box-rhw-one" />
+-->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <!-- Coderunner: terminal / code badge -->
+  <symbol id="icon-coderunner" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="16" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <polyline points="7,9 10,12 7,15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="12.5" y1="15" x2="17" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- Chatbot: speech bubble with spark -->
+  <symbol id="icon-chatbot" viewBox="0 0 24 24">
+    <path d="M4 6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-5l-4 3v-3H7a3 3 0 0 1-3-3z"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="10" cy="10" r="1" fill="currentColor"/>
+    <circle cx="14" cy="10" r="1" fill="currentColor"/>
+    <path d="M19 3.5l1.2-1.2M19 3.5l-1.2-1.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- box.rhw.one: stylized box -->
+  <symbol id="icon-box-rhw-one" viewBox="0 0 24 24">
+    <path d="M3 7l9-4 9 4-9 4-9-4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M5 9v8l7 4 7-4V9" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M12 11v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+</svg>

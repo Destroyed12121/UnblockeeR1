@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unblockee-R-1</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts for Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Shared CSS -->
+    <link rel="stylesheet" href="all.css">
+
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="components/topbar.css">
+    <link rel="stylesheet" href="components/settings.css">
+    <link rel="stylesheet" href="components/changelog.css">
+    <link rel="stylesheet" href="components/chatbot.css">
+
+    <!-- SVG icon sprite for built-in shortcuts -->
+    <link rel="preload" as="image/svg+xml" href="components/icons.svg">
+
+    <!-- Page-specific styles -->
+    <style>
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: calc(100vh - var(--content-padding-top, 80px));
+            padding: 40px 20px;
+            gap: 40px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            width: 100%;
+            height: 50px;
+            font-size: 16px;
+            background-color: var(--search-bar-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            color: var(--text-primary);
+            padding: var(--padding-md) var(--padding-lg);
+            transition: border-color var(--transition-speed);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .search-bar::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .shortcuts-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .shortcuts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .shortcuts-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .shortcuts-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--card-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all var(--transition-speed);
+        }
+
+        .btn:hover {
+            background: var(--border-color);
+            transform: translateY(-1px);
+        }
+
+        .btn.active {
+            background: var(--text-primary);
+            color: var(--bg-color);
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .shortcut-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--text-secondary);
+        }
+
+        .shortcut-item.editing {
+            border-color: var(--text-secondary);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .shortcut-item i {
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            transition: color var(--transition-speed);
+        }
+
+        .shortcut-item:hover i {
+            color: var(--text-primary);
+        }
+
+        .shortcut-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .shortcut-item p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 5px 0 0 0;
+        }
+
+        /* Adjust description text size and opacity */
+        .shortcut-description {
+            font-size: 0.875rem;
+            /* Increased from 0.75rem to 0.875rem (2px bigger) */
+            color: rgba(161, 161, 166, 0.8);
+        }
+
+        /* Make shortcuts resize to fit text */
+        .shortcut-item {
+            min-height: auto;
+            padding: 15px 10px;
+        }
+
+        .shortcut-content {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .shortcut-info {
+            text-align: center;
+        }
+
+        .shortcut-name {
+            font-size: 1.125rem;
+            /* Slightly larger for better proportion */
+        }
+
+        .shortcut-delete {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .shortcut-item.editing .shortcut-delete {
+            display: flex;
+        }
+
+        .add-shortcut-container {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        .add-shortcut-form {
+            display: none;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        .add-shortcut-form.show {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr auto;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+
+        .context-menu {
+            position: fixed;
+            background: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background var(--transition-speed);
+            color: var(--text-primary);
+        }
+
+        .context-menu-item:hover {
+            background: var(--border-color);
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px 0;
+        }
+
+        .context-menu-item i {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .unblockee-main-title {
+            font-size: clamp(2.5rem, 6vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            margin: 0 0 10px 0;
+            text-align: center;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px 10px;
+                gap: 30px;
+            }
+
+            .shortcuts-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 15px;
+            }
+
+            .add-shortcut-form.show {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+
+    <!-- Offline indicator styles are now centralized in components/topbar.css -->
+
+    <!-- Scripts -->
+
+    <!-- Core Utilities (Consolidated) -->
+    <script src="utils/storage.js"></script>
+    <script src="utils/about-blank.js"></script>
+    <script src="unblockee-core.js" defer></script>
+
+    <!-- Component Scripts -->
+    <script src="components/topbar.js" defer></script>
+    <script src="components/settings.js" defer></script>
+    <script src="components/changelog.js" defer></script>
+
+    <!-- Shortcuts Component -->
+    <script src="components/shortcuts.js" defer></script>
+
+
+</head>
+
+<body class="with-topbar">
+    <!-- Background Element -->
+    <div id="app-background"></div>
+
+    <!-- Topbar Component -->
+    <div id="topbar-container"></div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner-overlay" id="loadingSpinner">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="unblockee-main-title">Unblockee-R-1</h1>
+
+        <!-- Search Container -->
+        <div class="search-container">
+            <input type="text" class="search-bar" id="searchInput" placeholder="Search or enter URL to proxy...">
+        </div>
+
+        <!-- Shortcuts Container -->
+        <div class="shortcuts-container" id="shortcuts-container">
+            <div class="shortcuts-header">
+                <h2 class="shortcuts-title">Quick Shortcuts</h2>
+                <div class="shortcuts-actions">
+                    <button class="btn" id="editShortcutsBtn" style="width: 90px;">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn" id="addShortcutsBtn" style="width: 150px;">
+                        <i class="fas fa-plus"></i> Add Shortcut
+                    </button>
+                </div>
+            </div>
+
+            <div class="shortcuts-grid" id="shortcuts-grid">
+                <!-- Shortcuts will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Add Shortcut Form -->
+        <div class="add-shortcut-container">
+            <div class="add-shortcut-form" id="addShortcutForm">
+                <div class="form-group">
+                    <label for="shortcutName">Name:</label>
+                    <input type="text" id="shortcutName" placeholder="e.g., Google">
+                </div>
+                <div class="form-group">
+                    <label for="shortcutIcon">Icon:</label>
+                    <select id="shortcutIcon">
+                        <option value="fas fa-globe">🌐 Globe</option>
+                        <option value="fas fa-gamepad">🎮 Gamepad</option>
+                        <option value="fas fa-film">🎬 Film</option>
+                        <option value="fas fa-music">🎵 Music</option>
+                        <option value="fas fa-book">📚 Book</option>
+                        <option value="fas fa-star">⭐ Star</option>
+                        <option value="fas fa-heart">❤️ Heart</option>
+                        <option value="fas fa-cog">⚙️ Settings</option>
+                        <option value="fas fa-code">💻 Code</option>
+                        <option value="fas fa-image">🖼️ Image</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="shortcutUrl">URL:</label>
+                    <input type="url" id="shortcutUrl" placeholder="https://example.com">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn" id="addShortcutBtn">
+                        <i class="fas fa-check"></i> Add
+                    </button>
+                    <button type="button" class="btn" id="hideAddShortcutFormBtn">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" id="openInAboutBlankBtn">
+            <i class="fas fa-external-link-alt"></i> Open in About:Blank
+        </div>
+        <div class="context-menu-item" id="openInBlobTabBtn">
+            <i class="fas fa-window-maximize"></i> Open in Blob Tab
+        </div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="editShortcutBtn">Edit</div>
+        <div class="context-menu-item" id="deleteShortcutBtn">Delete</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="closeContextMenuBtn">Close</div>
+    </div>
+
+</body>
+
+</html>
